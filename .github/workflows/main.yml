@@ -60,7 +60,7 @@ jobs:
           # Set 1 to check coverage for pytest (pytest-cov will be installed if not installed).
           coverage: 1
           # Path to check coverage.
-          pytest-cov-path: src
+          pytest-cov-path: src/
           # Set 1 to push the coverage result to coverage branch.
           coverage-push: 0
           # Token to push the coverage branch.

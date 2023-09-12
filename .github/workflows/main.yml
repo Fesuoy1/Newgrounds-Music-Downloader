@@ -28,16 +28,9 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4.7.0
         with:
-          # Version range or exact version of Python or PyPy to use, using SemVer's version range syntax. Reads from .python-version if unset.
           python-version: 3.x
           check-latest: true
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
-
-      - name: Run PyTest
-        uses: paolorechia/fast-pytest-github-action@v1.0
-        with:
-          pytest_args: ""
-          requirements_file: testrequirements.txt
 

@@ -1,1 +1,1 @@
-aiofiles, aiohttp, bs4, msgpack, pycached, requests, requests-cache, ujson, customtkinter
+aiofiles aiohttp bs4 msgpack pycached requests requests-cache ujson customtkinter

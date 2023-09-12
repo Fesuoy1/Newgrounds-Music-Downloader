@@ -26,6 +26,6 @@ jobs:
         uses: paolorechia/fast-pytest-github-action@v1.0
         with:
           # Args passed to pytest, provided as string
-          pytest_args: "-s"
+          pytest_args: "-s --cov=Newgrounds-Music-Downloader"
           # Requirements file to install test dependencies
           requirements_file: testrequirements.txt

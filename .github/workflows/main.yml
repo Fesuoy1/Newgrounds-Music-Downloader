@@ -38,6 +38,6 @@ jobs:
       - name: Run PyTest
         uses: paolorechia/fast-pytest-github-action@v1.0
         with:
-          pytest_args: "-s --cov=newgrounds_music_downloader"
+          pytest_args: ""
           requirements_file: testrequirements.txt
 

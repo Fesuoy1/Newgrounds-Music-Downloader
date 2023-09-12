@@ -7,4 +7,3 @@ requests
 requests-cache
 ujson
 customtkinter
-pytest

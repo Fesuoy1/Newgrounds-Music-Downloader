@@ -8,6 +8,7 @@ A Script to download songs from the Newgrounds and save them as MP3, featuring:
     - And some things to be added soon!
     
 """
+import http
 from tkinter import messagebox
 
 try:
@@ -48,9 +49,8 @@ except ImportError:
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("dark-blue")
 
-bools = (True, False) # False is 1. and True is 0
 
-debugging = bools[1]
+debugging = True
 
 if debugging:
     __import__("tracemalloc").start()
@@ -70,17 +70,6 @@ file_path = Path("Downloaded/")
 URL = "https://www.newgrounds.com/audio/listen/"
 DOWNLOAD_URL = "https://www.newgrounds.com/audio/download/"
 
-should_rename = bools[0]  # if False (1), the file will not be renamed, though it is probably recommended to keep it True (0)
-"""
-Determines if the file should be renamed or not.
-
-    Returns: True if the file should be renamed, False if the file should not be renamed
-"""
-if file_name != "Newgrounds_Music_Downloader.py" and should_rename:
-    os.rename(__file__, "Newgrounds_Music_Downloader.py")
-    messagebox.showinfo("Renamed",
-                        "The file has been renamed to Newgrounds_Music_Downloader.py to prevent any issues.")
-    input(f"Press Enter key to exit.\n")
 pyc.compile(__file__, optimize=-1)
 pycached.SimpleMemoryCache(serializer=msgpack)
 ujson.decoders = [lambda x: ujson.loads(x)]
@@ -92,8 +81,8 @@ linecache.cache = {
     "title_end": 0,
     "response": None,
     "download_url": DOWNLOAD_URL,
-    "complete": bools[1],
-    "downloaded": bools[1],
+    "complete": False,
+    "downloaded": False,
     "CTk": Tk,
     "CTkEntry": CTkEntry,
     "CTkLabel": CTkLabel,
@@ -106,7 +95,8 @@ linecache.cache = {
     "os": os,
     "re": re,
     "webbrowser": webbrowser,
-    "beautifulsoup": BeautifulSoup
+    "beautifulsoup": BeautifulSoup,
+    "warnings": warnings
 }
 linecache.lazycache(__file__,
                     module_globals=dict(linecache=linecache.cache, pycached=pycached, py_compile=pyc, ujson=ujson,
@@ -457,7 +447,7 @@ def on_yes_click():
     """
     yes_button.configure(state="disabled", text="Downloading...")
     song_id = song_entry.get()
-    threading.Thread(target=asyncio.run, args=(download_song(song_id),)).start()
+    threading.Thread(target=asyncio.run, args=(download_song(song_id),), daemon=True).start()
 
 
 def open_musicurl():
@@ -479,7 +469,10 @@ async def download_song(song_id):
             messagebox.showerror("Error",
                                  "Failed to download the song. Maybe you do not have administrator privileges?")
     except Exception as e:
-        handle_error(e)
+        if str(e).startswith("HTTP Error 400"):
+            messagebox.showerror("Error", "Download may be disabled for this song.")
+        else:
+            handle_error(e)
         if os.path.exists(cache.get("song_path")):
             os.remove(cache.get("song_path"))
 
@@ -502,6 +495,7 @@ def clear_cache():
         linecache.clearcache()
         cache.clear()
         shutil.rmtree("__pycache__", ignore_errors=True)
+        shutil.rmtree("cache", ignore_errors=True)
         messagebox.showinfo("Cache Cleared", "Cache has been cleared successfully.")
 
 
@@ -541,7 +535,7 @@ def yt_window():
         handle_error(e)
 
 
-def on_progress(stream, chunk, bytes_remaining):
+def on_progress(stream, bytes_remaining):
     total_size = stream.filesize
     bytes_downloaded = total_size - bytes_remaining
     poc = bytes_downloaded / total_size * 100
@@ -551,12 +545,12 @@ def on_progress(stream, chunk, bytes_remaining):
     progress.set(float(poc) / 100)
 
 
-def on_complete(stream, file_path):
+def on_complete():
     messagebox.showinfo("Success", "Audio Downloaded Successfully! the file is saved at the Downloaded folder.")
     yt_entry.delete(0, ctk.END)
 
 
-def vid_on_complete(stream, file_path):
+def vid_on_complete():
     messagebox.showinfo("Success", "Video Downloaded Successfully! the file is saved at the Downloaded folder.")
     yt_entry.delete(0, ctk.END)
 
